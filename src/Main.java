@@ -24,7 +24,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 20; i++){
             Jugador player = new Jugador();
             player.setName("jugador " + i);
             player.start();
@@ -71,21 +71,27 @@ class Jugador extends Thread{
                 } else {
 
                     semaphorePosiciones.release(5);
+                    Random random = new Random();
+                    Integer num = random.nextInt();
+                    System.out.println("Entro " + num);
                     semaphorePosiciones.acquire();
+                    System.out.println("Salgo " + num);
 
                     if (Main.hayGanador.compareAndSet(false, true)) {
 
                         System.out.println("EL " + getName() + " HA GANADO");
 
-                    } else if (Main.puesto.get() <= 5) {
-
-                        System.out.println("EL " + getName() + " HA QUEDADO EN LA POSICION " + Main.puesto.getAndIncrement());
-
                     } else {
+                        int i = Main.puesto.getAndIncrement();
+                        if (i <= 5) {
+                            System.out.println("EL " + getName() + " HA QUEDADO EN LA POSICION " + (i));
 
-                        System.out.println("El " + getName() + " no ha llegado a tiempo a la prueba " + numPrueba + " y ha sido descalificado");
-                        return;
+                        } else {
 
+                            System.out.println("El " + getName() + " no ha llegado a tiempo a la prueba " + numPrueba + " y ha sido descalificado");
+                            return;
+
+                        }
                     }
                 }
             }
@@ -129,12 +135,14 @@ class Jugador extends Thread{
         try {
 
             semaphore2.acquire();
+            System.out.println("Esto deber•a salir con 10 m♣s a la vez");
+            Thread.sleep(5000);
             realizarPrueba(2);
 
         } catch (InterruptedException e) {
 
             e.printStackTrace();
-            
+
         }
     }
 }
